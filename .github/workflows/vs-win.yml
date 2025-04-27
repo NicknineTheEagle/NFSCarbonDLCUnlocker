@@ -35,7 +35,7 @@ jobs:
         run: |
           mkdir artifacts
           copy Release\NFSCarbonDLCUnlocker.dll artifacts\NFSCarbonDLCUnlocker.asi
-          copy Release\NFSCarbonDLCUnlocker.dll artifacts\NFSCarbonDLCUnlocker.pdb
+          copy Release\NFSCarbonDLCUnlocker.pdb artifacts\NFSCarbonDLCUnlocker.pdb
           copy NFSCarbonDLCUnlocker\resources\dlc.txt artifacts\dlc.txt
           xcopy /E /I /Y NFSCarbonDLCUnlocker\resources\dlc_examples artifacts\dlc_examples
 
