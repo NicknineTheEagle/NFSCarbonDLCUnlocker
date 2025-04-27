@@ -25,7 +25,18 @@ int bStringHash( const char *a1 )
 
 bool __fastcall UnlockSystem_IsDLCUnlock( void *_this, void *_edx, int unlock )
 {
+	// Check if we have the specified unlock in dlc.txt.
 	return ( std::find( g_dlcList.begin(), g_dlcList.end(), unlock ) != g_dlcList.end() );
+}
+
+bool __cdecl ISelectablePart_CheckOnlineParts( void *carPart )
+{
+	// This function hides Xbox 360 exclusive Virus vinyls.
+	// We replace it with a stub that always returns true to unhide them.
+	if ( carPart == NULL )
+		return false;
+
+	return true;
 }
 
 void Initialize()
@@ -46,7 +57,10 @@ void Initialize()
 	if ( MH_Initialize() != MH_OK )
 		return;
 
-	if ( MH_CreateHook( (LPVOID)0x820280, &UnlockSystem_IsDLCUnlock, NULL ) != MH_OK )
+	if ( MH_CreateHook( (LPVOID)0x00820280, &UnlockSystem_IsDLCUnlock, NULL ) != MH_OK )
+		return;
+
+	if ( MH_CreateHook( (LPVOID)0x00577620, &ISelectablePart_CheckOnlineParts, NULL ) != MH_OK )
 		return;
 
 	if ( MH_EnableHook( MH_ALL_HOOKS ) != MH_OK )
