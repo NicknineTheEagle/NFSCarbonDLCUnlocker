@@ -4,6 +4,7 @@
 #include <vector>
 
 #include <MinHook.h>
+#include <Hooking.Patterns.h>
 
 std::vector<int> g_dlcList;
 
@@ -41,6 +42,7 @@ bool __cdecl ISelectablePart_CheckOnlineParts( void *carPart )
 
 void Initialize()
 {
+	// Read the list of unlocks.
 	std::ifstream file( "dlc.txt" );
 	if ( !file.is_open() )
 		return;
@@ -57,10 +59,19 @@ void Initialize()
 	if ( MH_Initialize() != MH_OK )
 		return;
 
-	if ( MH_CreateHook( (LPVOID)0x00820280, &UnlockSystem_IsDLCUnlock, NULL ) != MH_OK )
+	// Locate the functions we need to hook in the game code.
+	auto pattern_IsDLCUnlock = hook::pattern( "56 8B 71 10 85 F6 74 1B 8B 51 14 33 C0 85 D2 76 12 8B CE 8B 74 24 08" );
+	if ( pattern_IsDLCUnlock.empty() )
 		return;
 
-	if ( MH_CreateHook( (LPVOID)0x00577620, &ISelectablePart_CheckOnlineParts, NULL ) != MH_OK )
+	auto pattern_CheckOnlineParts = hook::pattern( "56 8B 74 24 08 85 F6 75 04 32 C0 5E C3 57 68 ? ? ? 00 E8" );
+	if ( pattern_CheckOnlineParts.empty() )
+		return;
+
+	if ( MH_CreateHook( pattern_IsDLCUnlock.get_first(), &UnlockSystem_IsDLCUnlock, NULL ) != MH_OK )
+		return;
+
+	if ( MH_CreateHook( pattern_CheckOnlineParts.get_first(), &ISelectablePart_CheckOnlineParts, NULL ) != MH_OK )
 		return;
 
 	if ( MH_EnableHook( MH_ALL_HOOKS ) != MH_OK )

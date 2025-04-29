@@ -18,9 +18,15 @@
     <ClCompile Include="NFSCarbonDLCUnlocker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\thirdparty\patterns\Hooking.Patterns.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\thirdparty\MinHook\include\MinHook.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\thirdparty\patterns\Hooking.Patterns.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

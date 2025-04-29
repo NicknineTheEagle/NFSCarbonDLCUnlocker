@@ -1,0 +1,3 @@
+[submodule "thirdparty/patterns"]
+	path = thirdparty/patterns
+	url = https://github.com/ThirteenAG/Hooking.Patterns.git
