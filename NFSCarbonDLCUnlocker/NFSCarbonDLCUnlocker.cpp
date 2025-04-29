@@ -2,10 +2,12 @@
 #include <fstream>
 #include <string>
 #include <vector>
+#include <filesystem>
 
 #include <MinHook.h>
 #include <Hooking.Patterns.h>
 
+HMODULE g_module = NULL;
 std::vector<int> g_dlcList;
 
 int bStringHash( const char *a1 )
@@ -40,10 +42,21 @@ bool __cdecl ISelectablePart_CheckOnlineParts( void *carPart )
 	return true;
 }
 
+bool g_initialized = false;
+
 void Initialize()
 {
+	if ( g_initialized )
+		return;
+
+	g_initialized = true;
+
+	WCHAR pathStr[MAX_PATH];
+	GetModuleFileNameW( g_module, pathStr, ARRAYSIZE( pathStr ) );
+	std::filesystem::path modulePath( pathStr );
+
 	// Read the list of unlocks.
-	std::ifstream file( "dlc.txt" );
+	std::ifstream file( modulePath.parent_path() / L"dlc.txt" );
 	if ( !file.is_open() )
 		return;
 
@@ -55,9 +68,6 @@ void Initialize()
 
 		g_dlcList.push_back( bStringHash( str.c_str() ) );
 	}
-
-	if ( MH_Initialize() != MH_OK )
-		return;
 
 	// Locate the functions we need to hook in the game code.
 	auto pattern_IsDLCUnlock = hook::pattern( "56 8B 71 10 85 F6 74 1B 8B 51 14 33 C0 85 D2 76 12 8B CE 8B 74 24 08" );
@@ -78,11 +88,34 @@ void Initialize()
 		return;
 }
 
-BOOL WINAPI DllMain( HINSTANCE /*hinstDLL*/, DWORD fdwReason, LPVOID /*lpvReserved*/ )
+void *( WINAPI *Direct3DCreate9_orig )( UINT ) = NULL;
+void *Direct3DCreate9_target = NULL;
+
+void *WINAPI Direct3DCreate9_hook( UINT SDKVersion )
+{
+	void *result = Direct3DCreate9_orig( SDKVersion );
+
+	Initialize();
+
+	return result;
+}
+
+extern "C" __declspec( dllexport ) void InitializeASI()
+{
+	// SafeDisc executables are encrypted so we can't insert our hooks just yet.
+	// Create an early hook that lets us know when the game code has finished decrypting.
+	MH_Initialize();
+	MH_CreateHookApiEx( L"d3d9", "Direct3DCreate9", &Direct3DCreate9_hook, (void **)&Direct3DCreate9_orig, &Direct3DCreate9_target );
+	MH_EnableHook( Direct3DCreate9_target );
+}
+
+BOOL WINAPI DllMain( HINSTANCE hinstDLL, DWORD fdwReason, LPVOID /*lpvReserved*/ )
 {
 	switch ( fdwReason )
 	{
 		case DLL_PROCESS_ATTACH:
+			g_module = hinstDLL;
+			break;
 		case DLL_THREAD_ATTACH:
 		case DLL_PROCESS_DETACH:
 		case DLL_THREAD_DETACH:
@@ -90,9 +123,4 @@ BOOL WINAPI DllMain( HINSTANCE /*hinstDLL*/, DWORD fdwReason, LPVOID /*lpvReserv
 			break;
 	}
 	return TRUE;
-}
-
-extern "C" __declspec( dllexport ) void InitializeASI()
-{
-	Initialize();
 }
