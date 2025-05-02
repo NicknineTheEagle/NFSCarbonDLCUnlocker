@@ -1,3 +1,6 @@
 [submodule "thirdparty/patterns"]
 	path = thirdparty/patterns
 	url = https://github.com/ThirteenAG/Hooking.Patterns.git
+[submodule "thirdparty/MinHook/MinHook"]
+	path = thirdparty/MinHook/MinHook
+	url = https://github.com/TsudaKageyu/minhook.git
