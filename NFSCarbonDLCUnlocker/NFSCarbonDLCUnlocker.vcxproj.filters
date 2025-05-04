@@ -23,10 +23,10 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\thirdparty\MinHook\include\MinHook.h">
+    <ClInclude Include="..\thirdparty\patterns\Hooking.Patterns.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\thirdparty\patterns\Hooking.Patterns.h">
+    <ClInclude Include="..\thirdparty\MinHook\MinHook\include\MinHook.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
