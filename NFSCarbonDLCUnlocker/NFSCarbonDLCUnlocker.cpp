@@ -74,7 +74,7 @@ void Initialize()
 	if ( pattern_IsDLCUnlock.empty() )
 		return;
 
-	auto pattern_CheckOnlineParts = hook::pattern( "56 8B 74 24 08 85 F6 75 04 32 C0 5E C3 57 68 ? ? ? 00 E8" );
+	auto pattern_CheckOnlineParts = hook::pattern( "56 8B 74 24 08 85 F6 75 04 32 C0 5E C3 57 68 ? ? ? ? E8" );
 	if ( pattern_CheckOnlineParts.empty() )
 		return;
 
