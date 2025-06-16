@@ -78,9 +78,11 @@ void Initialize()
 	if ( pattern_CheckOnlineParts.empty() )
 		return;
 
+	// 0x00820280
 	if ( MH_CreateHook( pattern_IsDLCUnlock.get_first(), &UnlockSystem_IsDLCUnlock, NULL ) != MH_OK )
 		return;
 
+	// 0x00577620
 	if ( MH_CreateHook( pattern_CheckOnlineParts.get_first(), &ISelectablePart_CheckOnlineParts, NULL ) != MH_OK )
 		return;
 
